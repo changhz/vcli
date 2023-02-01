@@ -16,6 +16,12 @@ fn main() {
   mut version := fprs.string('version', `v`, '0.0.1', "Version")
   mut desc := fprs.string('desc', `d`, '', "Description")
 
+  additional_args := fprs.finalize()!
+
+  if additional_args.len > 0 {
+    println('Unprocessed arguments:\n$additional_args.join_lines()')
+  }
+
   if prjname == '' {
     prjname = from_input('project name')
     if abort_key == prjname {
@@ -40,10 +46,16 @@ fn main() {
 
   mut p1 := fprs.string('strparam', `s`, 'default value', 'String Parameter').to_lower()
   mut p2 := fprs.int('intparam', `n`, 0, 'Integer Parameter')
+
+  additional_args := fprs.finalize()!
+
+  if additional_args.len > 0 {
+    println('Unprocessed arguments:\\n\$additional_args.join_lines()')
+  }
 }
   ")
 
-	if os.exists(prjname) {
+  if os.exists(prjname) {
     println('Sorry, I Refuse to proceed: folder named "$prjname" exists already')
     return
   }
