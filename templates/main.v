@@ -6,7 +6,7 @@ import flag
 const abort_key = ':q'
 
 fn main() {
-  fprs := flag.new_flag_parser(os.args)
+  mut fprs := flag.new_flag_parser(os.args)
   fprs.application('%prjname%')
   fprs.version('%version%')
   fprs.description('%desc%')
