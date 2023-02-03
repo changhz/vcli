@@ -2,6 +2,7 @@ module main
 
 import os
 import flag
+import regex { regex_opt }
 
 const abort_key = 'q'
 
@@ -13,8 +14,8 @@ fn main() {
   fprs.skip_executable()
 
   mut prjname := fprs.string('name', `n`, '', "Project Name").to_lower()
-  mut version := fprs.string('version', `v`, '0.0.1', "Version")
-  mut desc := fprs.string('desc', `d`, '', "Description")
+  version := fprs.string('version', `v`, '0.0.1', "Version")
+  desc := fprs.string('desc', `d`, '', "Description")
 
   additional_args := fprs.finalize()!
 
@@ -29,106 +30,36 @@ fn main() {
     }
   }
 
-  mut lines := ("
-module main
+  os.execute('rm -r dist/*')
 
-import os
-import flag
+  root := 'dist/$prjname'
+  os.mkdir(root)!
 
-const abort_key = 'q'
-
-fn main() {
-  mut fprs := flag.new_flag_parser(os.args)
-  fprs.application('$prjname')
-  fprs.version('$version')
-  fprs.description('$desc')
-  fprs.skip_executable()
-
-  mut p1 := fprs.string('strparam', `s`, 'default value', 'String Parameter').to_lower()
-  mut p2 := fprs.int('intparam', `n`, 0, 'Integer Parameter')
-
-  additional_args := fprs.finalize()!
-
-  if additional_args.len > 0 {
-    println('Unprocessed arguments:\\n\$additional_args.join_lines()')
+  vmap := {
+    'prjname': prjname
+    'version': version
+    'desc': desc
   }
-}
-  ")
 
-  if os.exists(prjname) {
-    println('Sorry, I Refuse to proceed: folder named "$prjname" exists already')
-    return
-  }
-  os.mkdir(prjname)!
-  os.write_file('$prjname/${prjname}.v', lines)!
+  mut lines := load_template('main.v', vmap)
+  os.write_file('$root/${prjname}.v', lines)!
 
-  lines = ("
-Module {
-  name: '$prjname'
-  description: '$desc'
-  version: '$version'
-  license: 'MIT'
-  dependencies: []
-}
-  ")
-  os.write_file('$prjname/v.mod', lines)!
+  lines = load_template('v.mod', vmap)
+  os.write_file('$root/v.mod', lines)!
+
+  os.execute('cp .editorconfig $root/.editorconfig')
+  os.execute('cp .gitattributes $root/.gitattributes')
+  os.execute('cp .gitignore $root/.gitignore')
   
-  lines = ("
-[*]
-charset = utf-8
-end_of_line = lf
-insert_final_newline = true
-trim_trailing_whitespace = true
-
-[*.v]
-indent_style = space
-indent_size = 4
-  ")
-  os.write_file('$prjname/.editorconfig', lines)!
-  
-  lines = ("
-* text=auto eol=lf
-*.bat eol=crlf
-
-**/*.v linguist-language=V
-**/*.vv linguist-language=V
-**/*.vsh linguist-language=V
-**/v.mod linguist-language=V
-  ")
-  os.write_file('$prjname/.gitattributes', lines)!
-  
-  lines = ("
-# Binaries for programs and plugins
-main
-vcli
-*.exe
-*.exe~
-*.so
-*.dylib
-*.dll
-
-# Ignore binary output folders
-bin/
-
-# Ignore common editor/system specific metadata
-.DS_Store
-.idea/
-.vscode/
-*.iml
-  ")
-  os.write_file('$prjname/.gitignore', lines)!
-  
-  lines = '# $prjname'
-  os.write_file('$prjname/README.md', lines)!
+  lines = '# $prjname\n$desc'
+  os.write_file('$root/README.md', lines)!
 }
 
 fn from_input(name string) string {
   for true {
     input_str := (os.input_opt('Please enter $name:\n') or { '' }).to_lower()
     
-    if abort_key == input_str {
-      return abort_key
-    }
+    if abort_key == input_str { return abort_key }
 
     if '' == input_str {
       println("Invalid input (enter '$abort_key' to abort)")
@@ -138,4 +69,17 @@ fn from_input(name string) string {
     return input_str
   }
   return abort_key
+}
+
+fn load_template(file string, vmap map[string]string) string {
+  mut lines := os.read_file('templates/$file') or {
+    panic('failed to read file $file')
+  }
+
+  mut re := regex.RE{}
+  for k in ['prjname', 'version', 'desc'] {
+    re = regex_opt('%$k%') or { panic('this is so wrong') }
+    lines = re.replace(lines, vmap[k])
+  }
+  return lines
 }
