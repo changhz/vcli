@@ -2,9 +2,8 @@ module main
 
 import os
 import flag
-import regex { regex_opt }
-
-const abort_key = 'q'
+import regex {regex_opt}
+import input {from_input, abort_key}
 
 fn main() {
 	mut fprs := flag.new_flag_parser(os.args)
@@ -52,22 +51,6 @@ fn main() {
 	
 	lines = '# $prjname\n$desc'
 	os.write_file('$root/README.md', lines)!
-}
-
-fn from_input(name string) string {
-	for true {
-		input_str := (os.input_opt('Please enter $name:\n') or { '' }).to_lower()
-		
-		if abort_key == input_str { return abort_key }
-
-		if '' == input_str {
-			println("Invalid input (enter '$abort_key' to abort)")
-			continue
-		}
-
-		return input_str
-	}
-	return abort_key
 }
 
 fn load_template(file string, vmap map[string]string) string {
