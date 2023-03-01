@@ -10,11 +10,11 @@ fn main() {
 	mut fprs := flag.new_flag_parser(os.args)
 	fprs.application('vcli')
 	fprs.version('0.0.1')
-	fprs.description('Boilerplate for making V CLI tools')
+	fprs.description('V CLI tool starter')
 	fprs.skip_executable()
 
 	mut prjname := fprs.string('name', `n`, '', "Project Name").to_lower()
-	version := fprs.string('version', `v`, '0.0.1', "Version")
+	version := fprs.string('version', `v`, '0.0.3', "Version")
 	desc := fprs.string('desc', `d`, '', "Description")
 
 	additional_args := fprs.finalize()!
@@ -25,9 +25,7 @@ fn main() {
 
 	if prjname == '' {
 		prjname = from_input('project name')
-		if abort_key == prjname {
-			return
-		}
+		if abort_key == prjname { return }
 	}
 
 	os.execute('rm -r dist/*')
@@ -50,6 +48,7 @@ fn main() {
 	os.execute('cp .editorconfig $root/.editorconfig')
 	os.execute('cp .gitattributes $root/.gitattributes')
 	os.execute('cp .gitignore $root/.gitignore')
+	os.execute('cp -r lib $root/')
 	
 	lines = '# $prjname\n$desc'
 	os.write_file('$root/README.md', lines)!
