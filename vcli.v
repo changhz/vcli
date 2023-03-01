@@ -3,17 +3,17 @@ module main
 import os
 import flag
 import lib.restr {String}
-import lib.input {from_input}
+import lib.input {str_input}
 
 fn main() {
 	mut fprs := flag.new_flag_parser(os.args)
 	fprs.application('vcli')
-	fprs.version('0.0.1')
+	fprs.version('0.1.0')
 	fprs.description('V CLI tool starter')
 	fprs.skip_executable()
 
 	mut prjname := fprs.string('name', `n`, '', "Project Name").to_lower()
-	version := fprs.string('version', `v`, '0.0.3', "Version")
+	version := fprs.string('version', `v`, '0.0.1', "Version")
 	desc := fprs.string('desc', `d`, '', "Description")
 
 	additional_args := fprs.finalize()!
@@ -23,7 +23,7 @@ fn main() {
 	}
 
 	if prjname == '' {
-		prjname = from_input('project name')
+		prjname = str_input('Please enter project name:')
 		if input.abort_key == prjname { return }
 	}
 
