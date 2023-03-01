@@ -2,7 +2,7 @@ dist/*
 
 # Binaries for programs and plugins
 main
-vcli
+%prjname%
 *.exe
 *.exe~
 *.so

@@ -2,7 +2,7 @@ module main
 
 import os
 import flag
-import regex {regex_opt}
+import lib.restr {String}
 import lib.input {from_input}
 
 fn main() {
@@ -38,30 +38,30 @@ fn main() {
 		'desc': desc
 	}
 
-	mut lines := load_template('main.v', vmap)
-	os.write_file('$root/${prjname}.v', lines)!
+	mut text := load_template('main.v', vmap)
+	os.write_file('$root/${prjname}.v', text)!
 
-	lines = load_template('v.mod', vmap)
-	os.write_file('$root/v.mod', lines)!
+	text = load_template('v.mod', vmap)
+	os.write_file('$root/v.mod', text)!
+
+	text = load_template('.gitignore', vmap)
+	os.write_file('$root/.gitignore', text)!
 
 	os.execute('cp .editorconfig $root/.editorconfig')
 	os.execute('cp .gitattributes $root/.gitattributes')
-	os.execute('cp .gitignore $root/.gitignore')
 	os.execute('cp -r lib $root/')
 	
-	lines = '# $prjname\n$desc'
-	os.write_file('$root/README.md', lines)!
+	text = '# $prjname\n$desc'
+	os.write_file('$root/README.md', text)!
 }
 
 fn load_template(file string, vmap map[string]string) string {
-	mut lines := os.read_file('templates/$file') or {
+	mut text := os.read_file('templates/$file') or {
 		panic('failed to read file $file')
 	}
 
-	mut re := regex.RE{}
 	for k in ['prjname', 'version', 'desc'] {
-		re = regex_opt('%$k%') or { panic('this is so wrong') }
-		lines = re.replace(lines, vmap[k])
+		text = String(text).replace('%$k%', vmap[k])
 	}
-	return lines
+	return text
 }
