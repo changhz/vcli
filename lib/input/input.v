@@ -1,5 +1,7 @@
 module input
 
+import os
+
 pub const abort_key = 'q'
 
 pub fn from_input(name string) string {

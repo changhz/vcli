@@ -3,7 +3,7 @@ module main
 import os
 import flag
 import regex {regex_opt}
-import input {from_input, abort_key}
+import lib.input {from_input}
 
 fn main() {
 	mut fprs := flag.new_flag_parser(os.args)
@@ -24,7 +24,7 @@ fn main() {
 
 	if prjname == '' {
 		prjname = from_input('project name')
-		if abort_key == prjname { return }
+		if input.abort_key == prjname { return }
 	}
 
 	os.execute('rm -r dist/*')
