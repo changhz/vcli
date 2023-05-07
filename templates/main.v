@@ -1,5 +1,3 @@
-module main
-
 import os
 import flag
 import lib.input {str_input, f64_input}

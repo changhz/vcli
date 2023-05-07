@@ -11,7 +11,12 @@ pub fn (s String) matches(pattern string) bool {
 	return re.matches_string(s)
 }
 
-pub fn (s String) find(pattern string) []string {
+pub fn (s String) find(pattern string) (int, int) {
+	mut re := regex_opt(pattern) or {panic(ermsg)}
+	return re.find(s)
+}
+
+pub fn (s String) find_all(pattern string) []string {
 	mut re := regex_opt(pattern) or {panic(ermsg)}
 	return re.find_all_str(s)
 }
