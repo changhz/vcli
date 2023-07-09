@@ -25,10 +25,11 @@ fn main() {
 		if input.abort_key == prjname { return }
 	}
 
-	os.execute('rm -r dist/*')
-
-	root := 'dist/$prjname'
-	os.mkdir(root)!
+	root := './$prjname'
+	os.mkdir(root) or {
+		eprintln("Failed to create project directory")
+		return
+	}
 
 	vmap := {
 		'prjname': prjname
