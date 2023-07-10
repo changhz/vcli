@@ -55,7 +55,9 @@ fn main() {
 }
 
 fn load_template(file string, vmap map[string]string) string {
-	mut text := os.read_file('templates/$file') or {
+	vcliroot := $env('ROOT')
+
+	mut text := os.read_file('$vcliroot/templates/$file') or {
 		panic('failed to read file $file')
 	}
 
